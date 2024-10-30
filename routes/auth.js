@@ -55,44 +55,49 @@ router.post(
 router.post(
   "/login",
   [
-    body("email", "enter a valid email").isEmail(),
-    body("password", "enter avalid password").exists(),
+    body("email", "Enter a valid email").isEmail(),
+    body("password", "Enter a valid password").exists(),
   ],
   async (req, res) => {
-    let success=false
-   
+    let success = false;
+
+    // Validate request
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      return res.status(400), json({ errors: errors.array() });
+      return res.status(400).json({ errors: result.array() }); // Fixed the error here
     }
+
     const { email, password } = req.body;
+
     try {
+      // Find user by email
       let user = await User.findOne({ email });
       if (!user) {
-        return res
-          .status(400)
-          .json({success, error: "Please enter correct credientials" });
-      }
-      const passwordCompare = await bcrypt.compare(password, user.password);
-      if (!passwordCompare) {
-        success=false
-        return res
-          .status(400)
-          .json({success, error: "Please enter correct credientials" });
+        return res.status(400).json({ success, error: "Please enter correct credentials" }); // Corrected typo
       }
 
+      // Compare password
+      const passwordCompare = await bcrypt.compare(password, user.password);
+      if (!passwordCompare) {
+        return res.status(400).json({ success, error: "Please enter correct credentials" }); // Corrected typo
+      }
+
+      // Create JWT token
       const data = {
         user: user.id,
       };
       const authToken = jwt.sign(data, JWT_SECRET);
-      success=true
-      res.json({success, authToken });
+      success = true;
+
+      // Send response
+      res.json({ success, authToken });
     } catch (error) {
       console.error(error.message);
-      res.status(500).send("some internal server error occured");
+      res.status(500).send("Some internal server error occurred"); // Capitalized for consistency
     }
   }
 );
+
 
 //  ROUTE3 get loggedin  user  login required
 router.post(

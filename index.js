@@ -4,7 +4,7 @@ const connectToMongo=require('./db')
 const express = require('express')
 const corsOption ={
     
-  origin:["http://localhost:5173","http://localhost:4173",process.env.CLIENT_URL],
+  origin:["http://localhost:5173","http://localhost:4173","https://i-note-frontend.vercel.app"],
   credentials:true
 
 }
